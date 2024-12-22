@@ -1,0 +1,248 @@
+# Лабораторная работа №3
+**Тема: Использование принципов проектирования на уровне методов и классов**
+
+**Цель работы: Получить опыт проектирования и реализации модулей с использованием принципов KISS, YAGNI, DRY, SOLID и др.**
+## Диаграмма контейнеров
+![image](https://github.com/user-attachments/assets/8545586e-4553-46ff-9b84-c3fd1e950efc)
+## Диаграмма компонентов
+### Веб приложение
+![image](https://github.com/user-attachments/assets/d2d5f1db-1a34-4e47-ad6d-275abdc638cd)
+
+## Диаграмма последовательностей
+Выберем use case "Экспорт проекта пользователем"
+![image](https://github.com/user-attachments/assets/835a4975-738a-4171-b8e9-fc05f65cbd22)
+### Диаграмма последовательностей экспорта проекта
+![image](https://github.com/user-attachments/assets/3281d6d4-5430-4120-a0a0-896a61ba1998)
+
+В диаграмме показан экспорт проекта, и взаимодействие между пользователем и компонентами фронтенд программы.
+
+## Модель БД
+![image](https://github.com/user-attachments/assets/bf235471-9b12-4bdd-81b3-797ceb87cd83)
+
+Данная база данных содержит информацию про пользователей, а также проектов с досками и их содержимым. Она приведена к 3-ей нормальной форме (это выражается, например, в наличии суррогатной таблицы users_projects, в которой содержатся информация, какой пользователь с каким проектом имеет какую связь (owner, guest, ...))
+## Применение основных принципов разработки
+
+### KISS (Keep It Simple, Stupid)
+Не переусложнять код без веской на то причины.
+```ts
+export class BoardManager {
+    project: Project;
+    boards: { [key: number]: Board } = {};
+
+    createBoard(title: string): Board {
+        const board = new Board(title);
+        this.boards[title] = board;
+        return board;
+    }
+    deleteBoard(id: number): boolean {
+        if (this.boards[id]) {
+            delete this.boards[id];
+            return true;
+        }
+        return false;
+    }
+}
+```
+BoardManager делает ровно то что ожидаешь - создает и удаляет доски из проекта, код написан просто и понятно.
+### YAGNI (You Aren't Gonna Need It)
+Не реализовывать то, в чьей надобности ты не уверен.
+```ts
+export class Board {
+    title: string;
+    elements: Renderable[];
+
+    constructor(title: string) {
+        this.title = title;
+    }
+
+    addElement(element: Renderable) {
+        this.elements.push(element);
+    }
+
+    removeElement(element: Renderable) {
+        this.elements = this.elements.filter(e => e !== element);
+    }
+}
+```
+На данный момент, класс доски имеет такое простое наполнение наполнение - создание и удаление элементов, а также доске можно задать её название. Никаких ненужных абстракций, никакого лишнего кода.
+### DRY (Don't Repeat Yourself)
+Стараться писать максимально переиспользуемый код.
+```ts
+board.addElement(new TextElement(0, 0, 100, 200, "Первая идея", 14))
+board.addElement(new TextElement(200, 200, 100, 200, "Вторая идея", 14))
+```
+В принципе, любое применение функции больше одного раза - уже воплощение принципа DRY. В данном случае мы добавляем два элемента, и используем для этого одну функцию в классе Board.
+### SOLID
+#### S - Single Responsibility Principle (Принцип единственной ответственности)
+Каждый класс/метод/переменная/... имеет лишь одну функцию или ответственность. Реализовывать класс, объединяющий функции и швеца, и жнеца, и на дуде игреца - очень плохая идея.
+```ts
+export class BoardManager {
+    project: Project;
+    boards: { [key: number]: Board } = {};
+
+    createBoard(title: string): Board {
+        const board = new Board(title);
+        this.boards[title] = board;
+        return board;
+    }
+    deleteBoard(id: number): boolean {
+        if (this.boards[id]) {
+            delete this.boards[id];
+            return true;
+        }
+        return false;
+    }
+}
+```
+BoardManager отвечает только за управление досками в проекте, больше ни за что.
+#### O - Open/Closed Principle (Принцип открытости/закрытости)
+Классы открыты для расширения, но закрыты для модификации.
+```ts
+abstract class BoardElement {
+    protected x: number;
+    protected y: number;
+    protected width: number;
+    protected height: number;
+
+    constructor(x: number, y: number, width: number, height: number) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+    abstract render(): void;
+    abstract resize(width: number, height: number): void;
+    abstract move(x: number, y: number): void;
+}
+
+class ImageElement extends BoardElement {
+    private imageUrl: string;
+
+    constructor(x: number, y: number, width: number, height: number, imageUrl: string) {
+        super(x, y, width, height);
+        this.imageUrl = imageUrl;
+    }
+
+    render(): void {
+        //Отрисовка изображения по URL
+    }
+
+    resize(width: number, height: number): void {
+        this.width = width;
+        this.height = height;
+    }
+
+    move(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+class TextElement extends BoardElement {
+    private text: string;
+    private fontSize: number;
+
+    constructor(x: number, y: number, width: number, height: number, text: string, fontSize: number) {
+        super(x, y, width, height);
+        this.text = text;
+        this.fontSize = fontSize;
+    }
+
+    render(): void {
+        //Отрисовка текста
+    }
+
+    resize(width: number, height: number): void {
+        this.width = width;
+        this.height = height;
+    }
+
+    changeFontSize(size: number): void {
+        this.fontSize = size;
+        console.log(`Размер шрифта изменен на: ${this.fontSize}`);
+    }
+
+    move(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+    }
+} 
+```
+В данном случае у нас есть абстрактный класс BoardElement, от которого наследуются два дочерних класса - ImageElement и TextElement. Каждый класс добавляет свой специфический функционал, но не модифицирует базовое поведение класса.
+#### L - Liskov Substitution Principle (Принцип подстановки Лисков)
+Объекты дочерних классов должны быть взаимозаменяемыми с объектами родительского класса без изменения правильности программы.
+```ts
+const image = new ImageElement(10, 10, 100, 100, "https://example.com/image.jpg");
+const text = new TextElement(20, 20, 200, 50, "Привет, мир!", 16);
+...
+const elements: BoardElement[] = [image, text];
+elements.forEach(element => element.render()); 
+```
+Например, так как реализуется Open/Closed Principle, мы можем объекты различных дочерних классов группировать в один массив/список, и вызывать функции общего родительского класса. Какие бы мы не добавляли новые подклассы BoardElement, общий функционал будет работать. 
+#### I - Interface Segregation Principle (Принцип разделения интерфейса)
+В коде не должно быть бесполезных интерфейсов, которые не используются в данном контексте.
+```ts
+interface Renderable {
+    render(): void;
+}
+interface Resizable {
+    resize(width: number, height: number): void;
+}
+interface Movable {
+    move(x: number, y: number): void;
+}
+```
+Например, реализуем два интерфейса - Renderable, Resizable и Movable. Тогда BoardElement будет имплементировать эти интерфейсы. Однако же, если мы хотим только выводить какой-то элемент на экран, но не давать пользователю возможность его изменять и передвигать, то для этого нового класса будем имплементировать только лишь Renderable. Например, сделаем класс кнопки для пользовательского интерфейса.
+```ts
+abstract class BoardElement implements Renderable, Resizable, Movable {
+...
+}
+class Button implements Renderable {
+    render(): void {
+        //Отрисовка кнопки
+    }
+}
+```
+Таким образом, тем, кто будет работать над кодом в дальнейшем, будут точно знать, какая функциональность у каких элементов есть.
+#### D - Dependency Inversion Principle (Принцип инверсии зависимостей)
+Высокоуровневые модули не должны зависить от имплементации нижнеуровневых модулей. Они должны зависеть и работать от абстракций, оставляя реализацию и прочие детали за скобками.
+```ts
+const board = new Board();
+const myButton = new Button("Нажми меня", 100, 200);
+const myTextElement = new TextElement(0, 0, 100, 200, "Текст", 14);
+board.addElement(myButton);
+board.addElement(myTextElement);
+board.renderElements(); 
+```
+Board не имеет ни малейшего понятия, как именно работают элементы в списке elements. Главное - что они имплементируют интерфейс Renderable, а значит, что он может без боязни вызывать метод render у них, ведь достоверно известно, что все элементы его реализуют.
+
+## Дополнительные принципы разработки
+### BDUF. Big design up front («Масштабное проектирование прежде всего»)
+**BDUF** - принцип, по которому необходимо сначала максимально продумать и спроектировать все части системы, перед началом её реализации. Это именно тот принцип, который пытались нам вдолбить в головы все 4 года учёбы на Программного Инженера, но который успешно игнорировался. На 4 же курсе, теперь история совсем иная. Лично я еще не написал ни единой строчки кода для диплома, но при этом у нас есть куча предметов, по которым мы проектируем свой дипломный проект (Управление программными проектами, Проектирование архитектуры программных систем, Научно исследовательский семинар). Так что, можно сказать, что уж в этом году мы его полностью реализуем.
+
+Как итог:
+Принцип BDUF в разработке мы **используем**
+### SoC. Separation оf concerns (принцип разделения ответственности)
+**SoC** - если выражаться более поэтично, это принцип "Разделяй и властвуй". То есть, разбить единую систему (Монолит), на более мелкие куски, логические блоки. Этот принцип реализуется, в частности, в MVC (Model-View-Controller) и в Микросервисной архитектуре. Соответственно, во время выполнения диплома, я конечно же буду придерживаться такого разделения. Это здоровая практика разработки.
+
+Как итог:
+Принцип SoC в разработке мы **используем**
+### MVP. Minimum viable product (минимально жизнеспособный продукт)
+**MVP** - минимальный пример проекта, имеющий лишь только базовый функционал, но при этом всё равно имеющий ценность для пользователя - то есть, фактически, это хоть и плохой, но все таки продукт. 
+Честно говоря, чаще всего, не всегда получается курсовую/дипломную работу довести до степени MVP. Иногда она остаётся на уровне PoC, и либо дорабатывается в следующем году, либо так и остается гнить недоделанной в анналах GitHub.
+
+Все же, вот следующие признаки, из-за которых наши работы можно назвать MVP:
+- Минимальное количество тестирования
+- Сырая кодовая база, слепленная абы как (лично у меня так)
+- Есть ценность, которая реализует тему курсовой
+
+Как итог:
+Принцип MVP в разработке мы **используем**
+  
+### PoC. Proof of concept (доказательство концепции)
+**PoC** - минимальное доказательство концепции будущего продукта. Это именно, что доказательство, а не полноценный продукт. Это грязные, неотточенные и неоттестированные куски кода, кое-как слепленные воедино, служащие для одного - доказать себе, или посторонним лицам, что какая-то идея может сработать, если развить её до полноценного продукта. От MVP он отличается тем, что PoC не обязательно реализовывать все сценарии использования пользователем. Да PoC может быть даже интерактивным макетом в Figma. Главное - иметь ясную цель, или теорию, по проверке которой мы делаем PoC.
+
+Учитывая раннее сказанное, про то что некоторые наши курсовые/дипломные работы остаются в стадии PoC, можно с уверенностью сказать, что иногда мы этот концепт используем, хоть и не нарочно. Если же говорить именно про PoC, чтобы от него перейти к MVP - такое редко случалось. Так как цена ошибки у нас низка (На весь цикл разработки проекта выделяется максимум 9 месяцев, "продавать" продукт мы будем только научному руководителю и комиссии), то и проверять концепции нам не приходится - если что-то не так, то не страшно.
+
+Как итог:
+Принцип PoC в разработке мы **не используем**
