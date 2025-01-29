@@ -323,7 +323,6 @@
 
 #### 2.2 GET /projects/{id}
 ![image](https://github.com/user-attachments/assets/e2b97694-0acc-4971-ab10-dead7594e0ca)
-![image](https://github.com/user-attachments/assets/9f875a2c-81c3-4b26-b912-970b0dd6b624)
 
 ### 3. Boards
 #### 3.1 POST /boards
