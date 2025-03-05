@@ -347,6 +347,8 @@ export class CommandManager {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/76dfb6bd-b02e-406b-858b-ef32c031094c)
+
 ### State 
 Позволяет объектам менять своё поведение в зависимости от своего состояния. Например, на доске объекты могут быть в разных состояниях:
 ```js
@@ -414,6 +416,8 @@ class EditingState implements ElementState {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/0b2ee9a7-2a9d-4760-b251-6c47bc1d2ad1)
+
 ### Chain of Responsibility
 Позволяет дать шанс обработать запрос сразу нескольким объектам. Тем самым позволяет разъединить посылателя запроса с его принимателем.
 ```js
@@ -473,6 +477,8 @@ const backgroundHandler = new BackgroundClickHandler();
 
 elementHandler.setNext(groupHandler).setNext(backgroundHandler);
 ```
+![image](https://github.com/user-attachments/assets/6849216c-58f3-45e9-8b99-683d25faaa5f)
+
 ### Strategy
 Позволяет выбрать алгоритм решения той или иной задачи во время выполнения. Например, решить, как рендерить элементы, на основе того, с какого устройства зашел пользователь - с телефона или с десктопа.
 ```js
@@ -517,3 +523,4 @@ renderer.render(element);
 renderer.setStrategy(new MobileRenderStrategy());
 renderer.render(element);
 ```
+![image](https://github.com/user-attachments/assets/ad97796e-14bc-43e0-8c01-a56bd91174c1)
