@@ -7,7 +7,7 @@
 ## Шаблоны проектирования GoF
 
 ### Порождающие шаблоны
-#### Prototype
+#### 1. Prototype
 Компоненты в React приложениях обычно хранятся в виде готовых объектов, которые копируют и модифицируют по надобности
 ```js
 
@@ -69,7 +69,7 @@ export function Board() {
 ```
 ![image](https://github.com/user-attachments/assets/937d1bc1-c89d-4bad-8c40-d7fa10f73bf1)
 
-#### Singleton
+#### 2. Singleton
 Служит для того, чтобы гарантировать наличие только единственного экземпляра класса
 ```js
 export class RethinkDBElementRepository implements ElementRepository {
@@ -96,7 +96,7 @@ export class RethinkDBElementRepository implements ElementRepository {
 ```
 ![image](https://github.com/user-attachments/assets/da9b41ae-d224-480c-ac43-e1b3d3f70af1)
 
-### Factory method
+#### 3. Factory method
 Предоставляет интерфейс для создания объектов, но позволяет подклассам самим определить, какой класс инициализировать
 ```js
 class ElementFactory {
@@ -113,7 +113,7 @@ class ElementFactory {
 ![image](https://github.com/user-attachments/assets/48163ec4-c186-4ebc-9828-5412812a6740)
 
 ### Структурные шаблоны
-#### Composite
+#### 1. Composite
 Позволяет обращаться к группе объектов, как к одному объекту - как пользователь воспринимает это, так и со стороны кода. Одинаковый интерфейс для группы и отдельных объектов.
 ```js
 class Group implements Element {
@@ -138,7 +138,7 @@ class Group implements Element {
 ```
 ![image](https://github.com/user-attachments/assets/fe17abe7-9d9a-4ff8-92a7-566a7c626f25)
 
-#### Facade
+#### 2. Facade
 Предоставляет общий API для взаимодействия с системой. Прежде всего на ум приходит API Gateway, который инкапсилирует всё общение с микросервисами в один общий API.
 ```js
 import { AuthService } from "../services/authService";
@@ -184,7 +184,7 @@ router.post("/login", async (req, res) => {
 ```
 ![image](https://github.com/user-attachments/assets/9754d2e1-1f4a-4cf6-9a8e-bafe541bea5b)
 
-#### Proxy
+#### 3. Proxy
 Позволяет отложить загрузку тяжелых объектов на попозже, когда нужно будет их отрисовать, не нагружая систему при открытии доски.
 ```js
 interface Graphic {
@@ -220,7 +220,7 @@ class ImageProxy implements Graphic {
 ```
 ![image](https://github.com/user-attachments/assets/32cbcc7b-ad84-4851-a69b-c473c428b2a8)
 
-#### Decorator
+#### 4. Decorator
 Позволяет дополнять функционал без добавления новых подклассов.
 ```js
 abstract class GraphicDecorator implements Graphic {
@@ -252,7 +252,7 @@ class BorderDecorator extends GraphicDecorator {
 ![image](https://github.com/user-attachments/assets/f97bb36d-bf7c-4238-b156-de63f9536afe)
 
 ### Поведенченские шаблоны
-#### Observer
+#### 1. Observer
 Объект наблюдает за изменениями, и в их случае оповещает об этом все подписанные объекты
 ```js
 import { Server, Socket } from "socket.io";
@@ -300,7 +300,7 @@ export class WebSocketController {
 ```
 ![image](https://github.com/user-attachments/assets/e18c5ec9-b4db-482d-bbd2-48f946e59ad7)
 
-### Command
+#### 2. Command
 Позволяет инкапсулировать запросы в виде объектов, позволяя легко реализовать отмену изменений.
 ```js
 interface Command {
@@ -349,7 +349,7 @@ export class CommandManager {
 ```
 ![image](https://github.com/user-attachments/assets/76dfb6bd-b02e-406b-858b-ef32c031094c)
 
-### State 
+#### 3. State 
 Позволяет объектам менять своё поведение в зависимости от своего состояния. Например, на доске объекты могут быть в разных состояниях:
 ```js
 interface ElementState {
@@ -418,7 +418,7 @@ class EditingState implements ElementState {
 ```
 ![image](https://github.com/user-attachments/assets/0b2ee9a7-2a9d-4760-b251-6c47bc1d2ad1)
 
-### Chain of Responsibility
+#### 4. Chain of Responsibility
 Позволяет дать шанс обработать запрос сразу нескольким объектам. Тем самым позволяет разъединить посылателя запроса с его принимателем.
 ```js
 interface Handler {
@@ -479,7 +479,7 @@ elementHandler.setNext(groupHandler).setNext(backgroundHandler);
 ```
 ![image](https://github.com/user-attachments/assets/6849216c-58f3-45e9-8b99-683d25faaa5f)
 
-### Strategy
+#### 5. Strategy
 Позволяет выбрать алгоритм решения той или иной задачи во время выполнения. Например, решить, как рендерить элементы, на основе того, с какого устройства зашел пользователь - с телефона или с десктопа.
 ```js
 interface RenderStrategy {
