@@ -303,3 +303,129 @@ export class CommandManager {
     }
 }
 ```
+### State 
+Позволяет объектам менять своё поведение в зависимости от своего состояния. Например, на доске объекты могут быть в разных состояниях:
+```js
+interface ElementState {
+    clicked(user): void;
+    edit(user): void;
+    clickedAway(user): void;
+    draw(): void;
+    currentUser: void;
+}
+...
+class DefaultState implements ElementState {
+    clicked(user): void {
+	currentUser = user
+        //Перемещение в SelectedState
+    }
+
+    edit(user): void {
+        //Пусто
+    }
+
+    clickedAway(user): void {
+        //Пусто
+    }
+
+    draw(): void {
+        //Дефолтное отображение
+    }
+}
+class SelectedState implements ElementState {
+    clicked(user): void {
+        //Пусто
+    }
+
+    edit(user): void {
+	if user == currentUser:
+        //Перемещение в EditingState
+    }
+
+    clickedAway(): void {
+	if user == currentUser:
+        //Перемещение в DefaultState.");
+    }
+
+    draw(): void {
+        //Отображение объекта в хайлайте
+    }
+}
+class EditingState implements ElementState {
+    clicked(): void {
+    
+    }
+
+    edit(): void {
+	if user == currentUser:
+    	//Логика изменения
+    }
+
+    clickedAway(): void {
+    //Перемещение в DefaultState
+    }
+
+    draw(): void {
+	//Отображение объекта в хайлайте
+    }
+}
+```
+### Chain of Responsibility
+Позволяет дать шанс обработать запрос сразу нескольким объектам. Тем самым позволяет разъединить посылателя запроса с его принимателем.
+```js
+interface Handler {
+    setNext(handler: Handler): Handler;
+    handle(request: any): void;
+}
+...
+abstract class AbstractHandler implements Handler {
+    private nextHandler: Handler | null = null;
+
+    setNext(handler: Handler): Handler {
+        this.nextHandler = handler;
+        return handler;
+    }
+
+    handle(request: any): void {
+        if (this.nextHandler) {
+            this.nextHandler.handle(request);
+        }
+    }
+}
+...
+class ElementClickHandler extends AbstractHandler {
+    handle(request: any): void {
+        if (request.type === "element") {
+            console.log("Element click handled");
+        } else {
+            super.handle(request);
+        }
+    }
+}
+
+class GroupClickHandler extends AbstractHandler {
+    handle(request: any): void {
+        if (request.type === "group") {
+            console.log("Group click handled");
+        } else {
+            super.handle(request);
+        }
+    }
+}
+
+class BackgroundClickHandler extends AbstractHandler {
+    handle(request: any): void {
+        if (request.type === "background") {
+            console.log("Background click handled");
+        } else {
+            super.handle(request);
+        }
+    }
+}
+...
+const elementHandler = new ElementClickHandler();
+const groupHandler = new GroupClickHandler();
+const backgroundHandler = new BackgroundClickHandler();
+
+elementHandler.setNext(groupHandler).setNext(backgroundHandler);
+```
