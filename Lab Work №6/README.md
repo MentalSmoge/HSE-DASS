@@ -209,6 +209,35 @@ class ImageProxy implements Graphic {
     }
 }
 ```
+#### Decorator
+Позволяет дополнять функционал без добавления новых подклассов.
+```js
+abstract class GraphicDecorator implements Graphic {
+    protected graphic: Graphic;
+
+    constructor(graphic: Graphic) {
+        this.graphic = graphic;
+    }
+
+    draw(): void {
+        this.graphic.draw();
+    }
+}
+...
+class BorderDecorator extends GraphicDecorator {
+    private borderColor: string;
+
+    constructor(graphic: Graphic, borderColor: string = "black") {
+        super(graphic);
+        this.borderColor = borderColor;
+    }
+
+    draw(): void {
+        super.draw();
+        //Добавляем границу
+    }
+}
+```
 ### Поведенченские шаблоны
 #### Observer
 Объект наблюдает за изменениями, и в их случае оповещает об этом все подписанные объекты
