@@ -107,6 +107,108 @@ class ElementFactory {
     }
 }
 ```
+### Структурные шаблоны
+#### Composite
+Позволяет обращаться к группе объектов, как к одному объекту - как пользователь воспринимает это, так и со стороны кода. Одинаковый интерфейс для группы и отдельных объектов.
+```js
+class Group implements Element {
+    private children: Element[] = [];
+
+    add(child: Element): void {
+        this.children.push(child);
+    }
+
+    remove(child: Element): void {
+        this.children = this.children.filter(c => c !== child);
+    }
+
+    draw(): void {
+        this.children.forEach(child => child.draw());
+    }
+
+    move(x: number, y: number): void {
+        this.children.forEach(child => child.move(x, y));
+    }
+}
+```
+#### Facade
+Предоставляет общий API для взаимодействия с системой. Прежде всего на ум приходит API Gateway, который инкапсилирует всё общение с микросервисами в один общий API.
+```js
+import { AuthService } from "../services/authService";
+import { UserService } from "../services/userService";
+import { NotificationService } from "../services/notificationService";
+
+export class ApiGatewayFacade {
+    private authService: AuthService;
+    private userService: UserService;
+    private notificationService: NotificationService;
+
+    constructor() {
+        this.authService = new AuthService();
+        this.userService = new UserService();
+        this.notificationService = new NotificationService();
+    }
+
+    async login(username: string, password: string): Promise<string> {
+        return this.authService.login(username, password);
+    }
+
+    async getUserProfile(userId: string): Promise<any> {
+        return this.userService.getProfile(userId);
+    }
+
+    async sendNotification(userId: string, message: string): Promise<void> {
+        return this.notificationService.sendNotification(userId, message);
+    }
+}
+...
+//потом в роутере
+...
+router.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const token = await apiGateway.login(username, password);
+        res.json({ token });
+    } catch (error) {
+        res.status(401).json({ error: "Invalid credentials" });
+    }
+});
+...
+```
+#### Proxy
+Позволяет отложить загрузку тяжелых объектов на попозже, когда нужно будет их отрисовать, не нагружая систему при открытии доски.
+```js
+interface Graphic {
+    draw(): void;
+}
+...
+class Image implements Graphic {
+    constructor(private filename: string) {
+        this.loadImage();
+    }
+
+    private loadImage(): void {
+    	//Implement
+    }
+
+    draw(): void {
+        console.log(`Drawing image: ${this.filename}`);
+    }
+}
+...
+class ImageProxy implements Graphic {
+    private realImage: Image | null = null;
+
+    constructor(private filename: string) {}
+
+    draw(): void {
+        if (this.realImage === null) {
+            this.realImage = new HeavyImage(this.filename);
+        }
+        this.realImage.draw();
+    }
+}
+```
 ### Поведенченские шаблоны
 #### Observer
 Объект наблюдает за изменениями, и в их случае оповещает об этом все подписанные объекты
