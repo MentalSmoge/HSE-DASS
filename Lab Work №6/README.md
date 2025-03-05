@@ -7,7 +7,6 @@
 ## Шаблоны проектирования GoF
 
 ### Порождающие шаблоны
-<Представить с пояснения по каждому шаблону, указав название и назначение, сопроводив UML-диаграммой и соответствующим фрагментом программного кода>
 #### Prototype
 Компоненты в React приложениях обычно хранятся в виде готовых объектов, которые копируют и модифицируют по надобности
 ```js
@@ -68,6 +67,8 @@ export function Board() {
 	);
 }
 ```
+![image](https://github.com/user-attachments/assets/937d1bc1-c89d-4bad-8c40-d7fa10f73bf1)
+
 #### Singleton
 Служит для того, чтобы гарантировать наличие только единственного экземпляра класса
 ```js
@@ -93,6 +94,8 @@ export class RethinkDBElementRepository implements ElementRepository {
         return RethinkDBElementRepository.instance;
     }
 ```
+![image](https://github.com/user-attachments/assets/da9b41ae-d224-480c-ac43-e1b3d3f70af1)
+
 ### Factory method
 Предоставляет интерфейс для создания объектов, но позволяет подклассам самим определить, какой класс инициализировать
 ```js
@@ -107,6 +110,8 @@ class ElementFactory {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/48163ec4-c186-4ebc-9828-5412812a6740)
+
 ### Структурные шаблоны
 #### Composite
 Позволяет обращаться к группе объектов, как к одному объекту - как пользователь воспринимает это, так и со стороны кода. Одинаковый интерфейс для группы и отдельных объектов.
@@ -131,6 +136,8 @@ class Group implements Element {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/fe17abe7-9d9a-4ff8-92a7-566a7c626f25)
+
 #### Facade
 Предоставляет общий API для взаимодействия с системой. Прежде всего на ум приходит API Gateway, который инкапсилирует всё общение с микросервисами в один общий API.
 ```js
@@ -175,6 +182,8 @@ router.post("/login", async (req, res) => {
 });
 ...
 ```
+![image](https://github.com/user-attachments/assets/9754d2e1-1f4a-4cf6-9a8e-bafe541bea5b)
+
 #### Proxy
 Позволяет отложить загрузку тяжелых объектов на попозже, когда нужно будет их отрисовать, не нагружая систему при открытии доски.
 ```js
@@ -209,6 +218,8 @@ class ImageProxy implements Graphic {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/32cbcc7b-ad84-4851-a69b-c473c428b2a8)
+
 #### Decorator
 Позволяет дополнять функционал без добавления новых подклассов.
 ```js
@@ -238,6 +249,8 @@ class BorderDecorator extends GraphicDecorator {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/f97bb36d-bf7c-4238-b156-de63f9536afe)
+
 ### Поведенченские шаблоны
 #### Observer
 Объект наблюдает за изменениями, и в их случае оповещает об этом все подписанные объекты
@@ -285,6 +298,8 @@ export class WebSocketController {
     }
 }
 ```
+![image](https://github.com/user-attachments/assets/e18c5ec9-b4db-482d-bbd2-48f946e59ad7)
+
 ### Command
 Позволяет инкапсулировать запросы в виде объектов, позволяя легко реализовать отмену изменений.
 ```js
