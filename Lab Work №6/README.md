@@ -429,3 +429,47 @@ const backgroundHandler = new BackgroundClickHandler();
 
 elementHandler.setNext(groupHandler).setNext(backgroundHandler);
 ```
+### Strategy
+Позволяет выбрать алгоритм решения той или иной задачи во время выполнения. Например, решить, как рендерить элементы, на основе того, с какого устройства зашел пользователь - с телефона или с десктопа.
+```js
+interface RenderStrategy {
+    render(element: any): void;
+}
+...
+class DesktopRenderStrategy implements RenderStrategy {
+    render(element: any): void {
+        console.log(`Rendering element for desktop: ${JSON.stringify(element)}`);
+    }
+}
+
+class MobileRenderStrategy implements RenderStrategy {
+    render(element: any): void {
+        console.log(`Rendering element for mobile: ${JSON.stringify(element)}`);
+    }
+}
+...
+class ElementRenderer {
+    private strategy: RenderStrategy;
+
+    constructor(strategy: RenderStrategy) {
+        this.strategy = strategy;
+    }
+
+    setStrategy(strategy: RenderStrategy): void {
+        this.strategy = strategy;
+    }
+
+    render(element: any): void {
+        this.strategy.render(element);
+    }
+}
+...
+const element = { id: "1", type: "rect", x: 10, y: 20 };
+//Десктоп
+const renderer = new ElementRenderer(new DesktopRenderStrategy());
+renderer.render(element);
+
+//Мобильное
+renderer.setStrategy(new MobileRenderStrategy());
+renderer.render(element);
+```
